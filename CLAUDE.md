@@ -32,7 +32,7 @@ claude-pray/
 ├── tests/
 │   ├── prayer-times.test.ts  # Prayer calculation tests
 │   └── render.test.ts        # Render output tests
-├── dist/                     # Compiled JavaScript (git-ignored)
+├── dist/                     # Compiled JavaScript (committed for plugin installation)
 ├── package.json              # Dependencies and scripts
 ├── tsconfig.json             # TypeScript ES2022 + NodeNext modules
 ├── .gitignore
@@ -107,7 +107,7 @@ Settings are stored in `~/.claude/settings.json`:
 - **Target**: ES2022 (native fetch, top-level await)
 - **Module System**: ESM with NodeNext (requires `.js` imports)
 - **Strict Mode**: Enabled
-- **Output**: `dist/` directory (excluded from git)
+- **Output**: `dist/` directory (committed to git for plugin installation)
 
 ### Import Style
 

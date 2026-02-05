@@ -126,6 +126,8 @@ npm test
 npm run dev
 ```
 
+**Note**: The `dist/` directory is committed to the repository to enable direct plugin installation without requiring users to build from source.
+
 ### Project Structure
 
 ```
