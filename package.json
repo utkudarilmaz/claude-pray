@@ -1,0 +1,32 @@
+{
+  "name": "claude-pray",
+  "version": "0.1.0",
+  "description": "Islamic prayer times statusline for Claude Code",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "npm run build && node --test"
+  },
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "prayer",
+    "islamic",
+    "salah",
+    "statusline",
+    "aladhan"
+  ],
+  "author": {
+    "name": "Rush"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

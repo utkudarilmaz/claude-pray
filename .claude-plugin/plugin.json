@@ -1,0 +1,9 @@
+{
+  "name": "claude-pray",
+  "version": "0.1.0",
+  "description": "Islamic prayer times statusline for Claude Code",
+  "author": {
+    "name": "Rush"
+  },
+  "keywords": ["prayer", "islamic", "salah", "statusline", "muslim", "aladhan"]
+}

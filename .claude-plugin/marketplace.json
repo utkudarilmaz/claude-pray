@@ -1,0 +1,20 @@
+{
+  "name": "claude-pray",
+  "owner": {
+    "name": "Utku Darilmaz",
+    "email": "utku@fetchops.com"
+  },
+  "metadata": {
+    "description": "Real-time prayer time statusline for Claude Code",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "claude-pray",
+      "source": "./",
+      "description": "Islamic prayer times statusline for Claude Code",
+      "category": "monitoring",
+      "tags": ["prayer", "islamic", "salah", "statusline", "muslim", "aladhan"]
+    }
+  ]
+}
