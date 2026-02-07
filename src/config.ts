@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises';
 import { homedir } from 'os';
 import { join } from 'path';
-import type { ClaudePrayConfig, ClaudeSettings } from './types.js';
+import type { ClaudePrayConfig } from './types.js';
 
 const DEFAULT_CONFIG: ClaudePrayConfig = {
   city: '',
@@ -11,20 +11,17 @@ const DEFAULT_CONFIG: ClaudePrayConfig = {
 };
 
 export async function getConfig(): Promise<ClaudePrayConfig> {
-  const settingsPath = join(homedir(), '.claude', 'settings.json');
+  const configPath = join(homedir(), '.claude', 'claude-pray.json');
 
   try {
-    const content = await readFile(settingsPath, 'utf8');
-    const settings: ClaudeSettings = JSON.parse(content);
-
-    if (settings.claudePray) {
-      return {
-        ...DEFAULT_CONFIG,
-        ...settings.claudePray,
-      };
-    }
+    const content = await readFile(configPath, 'utf8');
+    const config: Partial<ClaudePrayConfig> = JSON.parse(content);
+    return {
+      ...DEFAULT_CONFIG,
+      ...config,
+    };
   } catch {
-    // Settings file doesn't exist or is invalid
+    // Config file doesn't exist or is invalid
   }
 
   return DEFAULT_CONFIG;

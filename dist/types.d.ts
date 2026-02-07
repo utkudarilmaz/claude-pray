@@ -52,14 +52,6 @@ export interface NextPrayer {
     remaining: string;
     isNow: boolean;
 }
-export interface ClaudeSettings {
-    statusLine?: {
-        type: string;
-        command: string;
-    };
-    claudePray?: ClaudePrayConfig;
-    [key: string]: unknown;
-}
 export declare const PRAYER_NAMES: readonly ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 export type PrayerName = (typeof PRAYER_NAMES)[number];
 export declare const CALCULATION_METHODS: Record<number, string>;

@@ -8,19 +8,17 @@ const DEFAULT_CONFIG = {
     enabled: false,
 };
 export async function getConfig() {
-    const settingsPath = join(homedir(), '.claude', 'settings.json');
+    const configPath = join(homedir(), '.claude', 'claude-pray.json');
     try {
-        const content = await readFile(settingsPath, 'utf8');
-        const settings = JSON.parse(content);
-        if (settings.claudePray) {
-            return {
-                ...DEFAULT_CONFIG,
-                ...settings.claudePray,
-            };
-        }
+        const content = await readFile(configPath, 'utf8');
+        const config = JSON.parse(content);
+        return {
+            ...DEFAULT_CONFIG,
+            ...config,
+        };
     }
     catch {
-        // Settings file doesn't exist or is invalid
+        // Config file doesn't exist or is invalid
     }
     return DEFAULT_CONFIG;
 }

@@ -54,15 +54,6 @@ export interface NextPrayer {
   isNow: boolean;
 }
 
-export interface ClaudeSettings {
-  statusLine?: {
-    type: string;
-    command: string;
-  };
-  claudePray?: ClaudePrayConfig;
-  [key: string]: unknown;
-}
-
 export const PRAYER_NAMES = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const;
 export type PrayerName = (typeof PRAYER_NAMES)[number];
 
