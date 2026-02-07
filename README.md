@@ -6,6 +6,8 @@
 
 Islamic prayer times statusline plugin for Claude Code.
 
+![claude-pray preview](docs/claude-pray-preview.png)
+
 ## Features
 
 - Displays next prayer time in Claude Code statusline
