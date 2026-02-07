@@ -62,7 +62,13 @@ Then run the install command below in that session. This is a [Claude Code platf
 This will:
 1. Ask for your city and country
 2. Let you select a calculation method
-3. Configure the statusline
+3. Detect conflicts with other statusline plugins (like claude-hud)
+4. Configure the statusline
+
+If you have claude-hud installed, you can choose to:
+- Chain both plugins together in the statusline
+- Replace claude-hud with claude-pray
+- Keep claude-hud and only save prayer configuration
 
 Done! The claude-pray appears immediately — no restart needed.
 

@@ -326,8 +326,17 @@ The `/claude-pray:setup` command is an interactive setup wizard documented in `c
 2. Ask for city and country
 3. Let user select calculation method
 4. Validate location by testing API
-5. Update `~/.claude/claude-pray.json` and `~/.claude/settings.json`
-6. Confirm success
+5. Detect statusline conflicts (check for claude-hud plugin)
+6. Update `~/.claude/claude-pray.json` and `~/.claude/settings.json`
+7. Confirm success
+
+**Statusline Conflict Handling:**
+If claude-hud plugin is detected, the setup wizard prompts the user with three options:
+- **Both**: Chain claude-pray and claude-hud together in the statusline
+- **claude-pray only**: Replace claude-hud with claude-pray
+- **Keep claude-hud**: Save prayer configuration but don't modify the statusline
+
+This allows users to combine multiple statusline plugins or choose their preferred display.
 
 **Implementation**: Claude Code reads `setup.md` and executes instructions using available tools (AskUserQuestion, Edit, Write, Bash).
 

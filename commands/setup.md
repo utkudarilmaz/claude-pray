@@ -60,9 +60,31 @@ Check that the response has `"code": 200` and contains prayer times data. If not
 - Try using a major city nearby
 - Verify the country code or name
 
-## Step 5: Update Configuration Files
+## Step 5: Detect Statusline Conflicts
 
-**5a. Create Plugin Configuration**
+Check if claude-hud is installed or active on this system:
+
+```bash
+# Check if claude-hud exists in plugin cache
+ls -d ~/.claude/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null | head -1
+
+# Check if current statusLine references claude-hud
+cat ~/.claude/settings.json 2>/dev/null | grep -o 'claude-hud' | head -1
+```
+
+**If either check finds claude-hud**, ask the user with AskUserQuestion (3 options):
+
+1. **Both** — Chain claude-pray and claude-hud together in the statusline
+2. **claude-pray only** — Replace claude-hud with claude-pray
+3. **Keep claude-hud** — Save prayer config but don't modify the statusline
+
+Store the user's choice for use in Step 6b.
+
+**If claude-hud is NOT found**, skip this step entirely — existing behavior applies unchanged.
+
+## Step 6: Update Configuration Files
+
+**6a. Create Plugin Configuration**
 
 Create or update `~/.claude/claude-pray.json` with the prayer configuration:
 
@@ -79,7 +101,24 @@ Where `USER_CITY`, `USER_COUNTRY`, and `METHOD_NUMBER` are from user input.
 
 Use the Write tool to create `~/.claude/claude-pray.json` with this configuration.
 
-**5b. Update Statusline Configuration**
+**6b. Update Statusline Configuration**
+
+**If the user chose "Keep claude-hud" in Step 5**, skip this entire sub-step. Instead, output the following message and proceed directly to Step 7:
+
+```
+Setup saved your prayer configuration but did not modify the statusline.
+
+Location: {city}, {country}
+Method: {method_name}
+
+claude-hud remains your active statusline. Re-run /claude-pray:setup to reconfigure later.
+```
+
+**If the user chose "Both" in Step 5**, force Scenario C below (chain claude-pray with the existing command).
+
+**If the user chose "claude-pray only" in Step 5**, force Scenario A below (replace with standalone claude-pray).
+
+**If claude-hud was NOT detected in Step 5**, use the existing A/B/C logic below unchanged.
 
 Read the current settings file:
 
@@ -120,7 +159,7 @@ Where `EXISTING_COMMAND` is the inner command from the existing statusline (extr
 
 Use the Edit or Write tool to update `~/.claude/settings.json`, merging with existing settings. Keep any existing settings intact.
 
-## Step 6: Confirm Success
+## Step 7: Confirm Success
 
 After updating settings, show a success message:
 
