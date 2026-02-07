@@ -6,7 +6,7 @@ This directory contains the TypeScript source code for the claude-pray plugin.
 
 - `index.ts` - Entry point that orchestrates stdin → config → render → stdout
 - `stdin.ts` - Parses JSON input from Claude Code via stdin
-- `config.ts` - Reads settings from ~/.claude/settings.json
+- `config.ts` - Reads settings from ~/.claude/claude-pray.json
 - `prayer-times.ts` - Fetches and calculates prayer times from Aladhan API
 - `types.ts` - TypeScript interfaces, types, and constants
 

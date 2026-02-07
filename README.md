@@ -93,7 +93,7 @@ If you prefer manual setup, create two configuration files:
 {
   "statusLine": {
     "type": "command",
-    "command": "bash -c '\"node\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
+    "command": "bash -c '\"node\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
   }
 }
 ```
@@ -187,7 +187,7 @@ Expected output: `☪ Asr in 1h 23m` (or setup prompt if not configured)
 3. Verify statusline configuration in `~/.claude/settings.json`
 4. Test the API manually:
    ```bash
-   curl "https://api.aladhan.com/v1/timingsByCity?city=YourCity&country=YourCountry&method=2"
+   curl -sL "https://api.aladhan.com/v1/timingsByCity?city=YourCity&country=YourCountry&method=2"
    ```
 5. Restart Claude Code to reload the statusline
 

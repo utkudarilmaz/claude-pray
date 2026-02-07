@@ -52,7 +52,7 @@ Use AskUserQuestion to let them pick from the most common methods, with "Other" 
 Test the API to ensure the location is valid:
 
 ```bash
-curl -s "https://api.aladhan.com/v1/timingsByCity?city=CITY&country=COUNTRY&method=METHOD"
+curl -sL "https://api.aladhan.com/v1/timingsByCity?city=CITY&country=COUNTRY&method=METHOD"
 ```
 
 Check that the response has `"code": 200` and contains prayer times data. If not, inform the user that the location may be invalid and ask them to:
@@ -87,18 +87,36 @@ Read the current settings file:
 cat ~/.claude/settings.json 2>/dev/null || echo '{}'
 ```
 
-Then update the statusline configuration in `~/.claude/settings.json`:
+The standalone claude-pray statusline command is:
+
+```
+bash -c '"RUNTIME" "$(ls -td ~/.claude/plugins/cache/claude-pray/claude-pray/*/ 2>/dev/null | head -1)dist/index.js"'
+```
+
+Where `RUNTIME` is either `bun` or `node` (full path preferred).
+
+**Handle three scenarios based on existing statusLine configuration:**
+
+**Scenario A: No existing `statusLine`** — Set claude-pray as the standalone statusline:
 
 ```json
 {
   "statusLine": {
     "type": "command",
-    "command": "bash -c '\"RUNTIME\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
+    "command": "bash -c '\"RUNTIME\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
   }
 }
 ```
 
-Where `RUNTIME` is either `bun` or `node` (full path preferred).
+**Scenario B: Existing `statusLine` that already contains `claude-pray`** — Update the existing command in place, fixing the glob pattern if needed (e.g., replace `claude-pray/*/` with `claude-pray/claude-pray/*/`). Keep the rest of the command unchanged.
+
+**Scenario C: Existing `statusLine` without `claude-pray`** — Chain claude-pray with the existing command. Extract the existing command value and create a combined command:
+
+```
+bash -c 'EXISTING=$(EXISTING_COMMAND 2>/dev/null); PRAY=$("RUNTIME" "$(ls -td ~/.claude/plugins/cache/claude-pray/claude-pray/*/ 2>/dev/null | head -1)dist/index.js" 2>/dev/null); echo "${EXISTING} ${PRAY}"'
+```
+
+Where `EXISTING_COMMAND` is the inner command from the existing statusline (extract the command string from inside the existing `bash -c '...'` wrapper, or use the raw command if it's not wrapped in bash -c).
 
 Use the Edit or Write tool to update `~/.claude/settings.json`, merging with existing settings. Keep any existing settings intact.
 
@@ -115,7 +133,7 @@ Method: {method_name}
 Prayer times will appear in your statusline. Restart Claude Code if needed.
 
 You can test the plugin by running:
-echo '{}' | node $(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | head -1)dist/index.js
+echo '{}' | node $(ls -td ~/.claude/plugins/cache/claude-pray/claude-pray/*/ 2>/dev/null | head -1)dist/index.js
 ```
 
 ## Error Handling

@@ -22,7 +22,7 @@ claude-pray/
 ├── src/
 │   ├── index.ts              # Entry point - orchestrates stdin → config → render
 │   ├── stdin.ts              # Parse JSON from Claude Code via stdin
-│   ├── config.ts             # Read settings from ~/.claude/settings.json
+│   ├── config.ts             # Read settings from ~/.claude/claude-pray.json
 │   ├── prayer-times.ts       # Fetch and calculate prayer times
 │   ├── types.ts              # TypeScript interfaces and constants
 │   └── render/
@@ -81,12 +81,14 @@ Plugin configuration is stored in `~/.claude/claude-pray.json`:
 {
   "statusLine": {
     "type": "command",
-    "command": "bash -c '\"node\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
+    "command": "bash -c '\"node\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
   }
 }
 ```
 
 The statusline command configuration remains in `settings.json` while prayer-specific settings are in the dedicated `claude-pray.json` config file.
+
+**Chaining Note**: If another statusline plugin (e.g., claude-hud) is already configured, the setup command chains both commands via bash variable assignment rather than overwriting the existing statusline.
 
 ### Prayer Time Calculation
 
@@ -199,12 +201,12 @@ npm test       # Build + run tests
 
 Claude Code installs plugins to:
 ```
-~/.claude/plugins/cache/claude-pray/<version>/
+~/.claude/plugins/cache/claude-pray/claude-pray/<version>/
 ```
 
 The statusline command uses a glob pattern to find the latest version:
 ```bash
-$(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | head -1)dist/index.js
+$(ls -td ~/.claude/plugins/cache/claude-pray/claude-pray/*/ 2>/dev/null | head -1)dist/index.js
 ```
 
 ## API Reference
@@ -269,7 +271,7 @@ Expected output examples:
 ### Testing API Calls
 
 ```bash
-curl "https://api.aladhan.com/v1/timingsByCity?city=Dubai&country=UAE&method=4"
+curl -sL "https://api.aladhan.com/v1/timingsByCity?city=Dubai&country=UAE&method=4"
 ```
 
 ### Validating Configuration
@@ -334,7 +336,7 @@ The `/claude-pray:setup` command is an interactive setup wizard documented in `c
 **Issue**: Prayer times not showing
 - Check `~/.claude/claude-pray.json` for `enabled: true`
 - Verify statusline command in `~/.claude/settings.json` points to correct dist path
-- Test API manually: `curl "https://api.aladhan.com/v1/timingsByCity?city=YourCity&country=YourCountry&method=2"`
+- Test API manually: `curl -sL "https://api.aladhan.com/v1/timingsByCity?city=YourCity&country=YourCountry&method=2"`
 
 **Issue**: Build errors
 - Ensure TypeScript 5+ is installed: `npm install`
