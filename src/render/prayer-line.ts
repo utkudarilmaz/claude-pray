@@ -11,11 +11,11 @@ export function renderPrayerLine(prayer: NextPrayer | null): string {
   const symbol = cyan(CRESCENT);
   const name = yellow(prayer.name);
 
-  if (prayer.isNow) {
-    return `${symbol} ${name} ${green('NOW')}`;
-  }
+  const timeInfo = prayer.isNow
+    ? green(`in ${prayer.remaining}`)
+    : dim(`in ${prayer.remaining}`);
 
-  return `${symbol} ${name} ${dim(`in ${prayer.remaining}`)}`;
+  return `${symbol} ${name} ${timeInfo}`;
 }
 
 export function renderSetupPrompt(): string {

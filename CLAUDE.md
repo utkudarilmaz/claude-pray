@@ -18,7 +18,7 @@ claude-pray/
 │   ├── marketplace.json      # Marketplace metadata (owner, category, tags)
 │   └── CLAUDE.md             # Plugin directory instructions
 ├── commands/
-│   └── setup.md              # Interactive setup command documentation
+│   └── SETUP.md              # Interactive setup command documentation
 ├── src/
 │   ├── index.ts              # Entry point - orchestrates stdin → config → render
 │   ├── stdin.ts              # Parse JSON from Claude Code via stdin
@@ -50,7 +50,7 @@ stdin (JSON) → Config Loading → Prayer API → Next Prayer Calculation → R
 ```
 
 1. **stdin.ts**: Reads JSON input from Claude Code (contains cwd, git info, etc.)
-2. **config.ts**: Loads `~/.claude/settings.json` and extracts `claudePray` section
+2. **config.ts**: Loads `~/.claude/claude-pray.json` for plugin configuration
 3. **prayer-times.ts**: Fetches daily prayer times from Aladhan API (with in-memory cache)
 4. **render/index.ts**: Coordinates rendering based on config and prayer data
 5. **render/prayer-line.ts**: Formats output with ANSI colors
@@ -58,20 +58,14 @@ stdin (JSON) → Config Loading → Prayer API → Next Prayer Calculation → R
 
 ### Configuration Schema
 
-Settings are stored in `~/.claude/settings.json`:
+Plugin configuration is stored in `~/.claude/claude-pray.json`:
 
 ```json
 {
-  "statusLine": {
-    "type": "command",
-    "command": "bash -c '\"node\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
-  },
-  "claudePray": {
-    "city": "Dubai",
-    "country": "UAE",
-    "method": 4,
-    "enabled": true
-  }
+  "city": "Dubai",
+  "country": "UAE",
+  "method": 4,
+  "enabled": true
 }
 ```
 
@@ -80,6 +74,19 @@ Settings are stored in `~/.claude/settings.json`:
 - `country`: Country code or name
 - `method`: Calculation method ID (0-14, see types.ts CALCULATION_METHODS)
 - `enabled`: Boolean flag to enable/disable the plugin
+
+**Statusline Configuration** in `~/.claude/settings.json`:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash -c '\"node\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
+  }
+}
+```
+
+The statusline command configuration remains in `settings.json` while prayer-specific settings are in the dedicated `claude-pray.json` config file.
 
 ### Prayer Time Calculation
 
@@ -95,8 +102,8 @@ Settings are stored in `~/.claude/settings.json`:
 5. **Now Flag**: Set true when prayer is within 15 minutes
 
 **Display States:**
-- `☪ Asr in 1h 23m` - Normal countdown
-- `☪ Maghrib NOW` - Within 15 minutes (green highlight)
+- `☪ Asr in 1h 23m` - Normal countdown (dim color)
+- `☪ Maghrib in 12m` - Within 15 minutes (green color for urgency)
 - `☪ Prayer times unavailable` - API error or network issue
 - `☪ Run /claude-pray:setup` - Not configured
 
@@ -154,11 +161,18 @@ export const colors = {
   reset: '\x1b[0m',
   cyan: '\x1b[36m',    // Crescent symbol
   yellow: '\x1b[33m',  // Prayer name
-  green: '\x1b[32m',   // "NOW" indicator
-  dim: '\x1b[2m',      // Time remaining
+  green: '\x1b[32m',   // Time remaining when prayer is imminent
+  dim: '\x1b[2m',      // Time remaining when prayer is more than 15 minutes away
   red: '\x1b[31m',     // Reserved for error states (not currently used)
 };
 ```
+
+**Color Usage:**
+- **Cyan**: Crescent symbol (☪)
+- **Yellow**: Prayer name
+- **Green**: Time remaining when prayer is within 15 minutes (imminent)
+- **Dim**: Time remaining when prayer is more than 15 minutes away (normal)
+- **Red**: Reserved for future error states (currently unused)
 
 **Note**: The `red()` helper function exists but is currently unused. It's reserved for potential future error display states (e.g., API failures, configuration errors).
 
@@ -261,7 +275,7 @@ curl "https://api.aladhan.com/v1/timingsByCity?city=Dubai&country=UAE&method=4"
 ### Validating Configuration
 
 ```bash
-cat ~/.claude/settings.json | jq '.claudePray'
+cat ~/.claude/claude-pray.json | jq '.'
 ```
 
 ### Manual Plugin Installation
@@ -303,23 +317,23 @@ The plugin intentionally has zero runtime dependencies to:
 
 ## Setup Command
 
-The `/claude-pray:setup` command is an interactive setup wizard documented in `commands/setup.md`.
+The `/claude-pray:setup` command is an interactive setup wizard documented in `commands/SETUP.md`.
 
 **Flow:**
 1. Detect runtime (prefer Bun, fallback to Node.js)
 2. Ask for city and country
 3. Let user select calculation method
 4. Validate location by testing API
-5. Update `~/.claude/settings.json`
+5. Update `~/.claude/claude-pray.json` and `~/.claude/settings.json`
 6. Confirm success
 
-**Implementation**: Claude Code reads `setup.md` and executes instructions using available tools (AskUserQuestion, Edit, Write, Bash).
+**Implementation**: Claude Code reads `SETUP.md` and executes instructions using available tools (AskUserQuestion, Edit, Write, Bash).
 
 ## Troubleshooting
 
 **Issue**: Prayer times not showing
-- Check `~/.claude/settings.json` for `claudePray.enabled: true`
-- Verify statusline command points to correct dist path
+- Check `~/.claude/claude-pray.json` for `enabled: true`
+- Verify statusline command in `~/.claude/settings.json` points to correct dist path
 - Test API manually: `curl "https://api.aladhan.com/v1/timingsByCity?city=YourCity&country=YourCountry&method=2"`
 
 **Issue**: Build errors

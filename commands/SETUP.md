@@ -60,7 +60,26 @@ Check that the response has `"code": 200` and contains prayer times data. If not
 - Try using a major city nearby
 - Verify the country code or name
 
-## Step 5: Update Settings
+## Step 5: Update Configuration Files
+
+**5a. Create Plugin Configuration**
+
+Create or update `~/.claude/claude-pray.json` with the prayer configuration:
+
+```json
+{
+  "city": "USER_CITY",
+  "country": "USER_COUNTRY",
+  "method": METHOD_NUMBER,
+  "enabled": true
+}
+```
+
+Where `USER_CITY`, `USER_COUNTRY`, and `METHOD_NUMBER` are from user input.
+
+Use the Write tool to create `~/.claude/claude-pray.json` with this configuration.
+
+**5b. Update Statusline Configuration**
 
 Read the current settings file:
 
@@ -68,28 +87,20 @@ Read the current settings file:
 cat ~/.claude/settings.json 2>/dev/null || echo '{}'
 ```
 
-Then update it with the new configuration. The settings should include:
+Then update the statusline configuration in `~/.claude/settings.json`:
 
 ```json
 {
   "statusLine": {
     "type": "command",
     "command": "bash -c '\"RUNTIME\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
-  },
-  "claudePray": {
-    "city": "USER_CITY",
-    "country": "USER_COUNTRY",
-    "method": METHOD_NUMBER,
-    "enabled": true
   }
 }
 ```
 
-Where:
-- `RUNTIME` is either `bun` or `node` (full path preferred)
-- `USER_CITY`, `USER_COUNTRY`, `METHOD_NUMBER` are from user input
+Where `RUNTIME` is either `bun` or `node` (full path preferred).
 
-Use the Edit or Write tool to update `~/.claude/settings.json`, merging with existing settings.
+Use the Edit or Write tool to update `~/.claude/settings.json`, merging with existing settings. Keep any existing settings intact.
 
 ## Step 6: Confirm Success
 
@@ -110,8 +121,9 @@ echo '{}' | node $(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | h
 ## Error Handling
 
 - If the API returns an error, suggest the user check their city/country spelling
-- If settings.json can't be written, show the required JSON for manual configuration
+- If config files can't be written, show the required JSON for manual configuration
 - If neither bun nor node is available, guide the user to install one
+- If `~/.claude/` directory doesn't exist, create it before writing config files
 
 ## Full Calculation Methods Reference
 

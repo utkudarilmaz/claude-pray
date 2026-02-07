@@ -11,7 +11,7 @@ Islamic prayer times statusline plugin for Claude Code.
 - Displays next prayer time in Claude Code statusline
 - Supports 15 calculation methods (ISNA, MWL, Umm Al-Qura, etc.)
 - Shows countdown to next prayer (e.g., "in 1h 23m")
-- Highlights when prayer time is imminent ("NOW" within 15 minutes)
+- Highlights imminent prayers (within 15 minutes) with green color
 - After Isha, shows time until tomorrow's Fajr
 - Zero runtime dependencies (uses native Node.js fetch)
 - In-memory caching to minimize API calls
@@ -23,47 +23,61 @@ Islamic prayer times statusline plugin for Claude Code.
 
 ## Installation
 
-Install as a Claude Code plugin:
+Inside a Claude Code instance, run the following commands:
 
-```bash
-claude plugins add /path/to/claude-pray
+**Step 1: Add the marketplace**
+```
+/plugin marketplace add utkudarilmaz/claude-pray
 ```
 
-Or from GitHub (replace with your GitHub username):
+**Step 2: Install the plugin**
 
-```bash
-claude plugins add github:yourusername/claude-pray
+<details>
+<summary><strong>⚠️ Linux users: Click here first</strong></summary>
+
+On Linux, `/tmp` is often a separate filesystem (tmpfs), which causes plugin installation to fail with:
+```
+EXDEV: cross-device link not permitted
 ```
 
-## Setup
+**Fix**: Set TMPDIR before installing:
+```bash
+mkdir -p ~/.cache/tmp && TMPDIR=~/.cache/tmp claude
+```
 
-Run the setup command in Claude Code:
+Then run the install command below in that session. This is a [Claude Code platform limitation](https://github.com/anthropics/claude-code/issues/14799).
 
+</details>
+
+```
+/plugin install claude-pray
+```
+
+**Step 3: Configure the statusline**
 ```
 /claude-pray:setup
 ```
+
 
 This will:
 1. Ask for your city and country
 2. Let you select a calculation method
 3. Configure the statusline
 
+Done! The claude-pray appears immediately — no restart needed.
+
 ## Manual Configuration
 
-If you prefer manual setup, edit `~/.claude/settings.json`:
+If you prefer manual setup, create two configuration files:
+
+**1. Plugin configuration in `~/.claude/claude-pray.json`:**
 
 ```json
 {
-  "statusLine": {
-    "type": "command",
-    "command": "bash -c '\"node\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
-  },
-  "claudePray": {
-    "city": "Dubai",
-    "country": "UAE",
-    "method": 4,
-    "enabled": true
-  }
+  "city": "Dubai",
+  "country": "UAE",
+  "method": 4,
+  "enabled": true
 }
 ```
 
@@ -72,6 +86,17 @@ If you prefer manual setup, edit `~/.claude/settings.json`:
 - `country`: Your country code or name (e.g., "UAE", "USA", "UK")
 - `method`: Calculation method ID (see table below)
 - `enabled`: Set to `true` to activate the plugin
+
+**2. Statusline configuration in `~/.claude/settings.json`:**
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash -c '\"node\" \"$(ls -td ~/.claude/plugins/cache/claude-pray/*/ 2>/dev/null | head -1)dist/index.js\"'"
+  }
+}
+```
 
 Replace `node` with `bun` in the command if you prefer using Bun runtime.
 
@@ -100,8 +125,8 @@ The default method is ISNA (ID: 2) if not configured.
 
 The statusline shows:
 
-- `☪ Asr in 1h 23m` - Next prayer with countdown
-- `☪ Maghrib NOW` - When within 15 minutes of prayer time
+- `☪ Asr in 1h 23m` - Next prayer with countdown (dim color)
+- `☪ Maghrib in 12m` - Imminent prayer (green color, within 15 minutes)
 - `☪ Run /claude-pray:setup` - When not configured
 
 ## API
@@ -134,7 +159,7 @@ npm run dev
 src/
 ├── index.ts              # Entry point
 ├── stdin.ts              # Parse Claude Code JSON input
-├── config.ts             # Read ~/.claude/settings.json
+├── config.ts             # Read ~/.claude/claude-pray.json
 ├── prayer-times.ts       # Fetch and calculate prayer times
 ├── types.ts              # TypeScript interfaces
 └── render/
@@ -157,13 +182,14 @@ Expected output: `☪ Asr in 1h 23m` (or setup prompt if not configured)
 ## Troubleshooting
 
 **Prayer times not showing?**
-1. Verify configuration in `~/.claude/settings.json`
-2. Check that `claudePray.enabled` is `true`
-3. Test the API manually:
+1. Verify plugin configuration exists: `cat ~/.claude/claude-pray.json`
+2. Check that `enabled` is `true` in the config file
+3. Verify statusline configuration in `~/.claude/settings.json`
+4. Test the API manually:
    ```bash
    curl "https://api.aladhan.com/v1/timingsByCity?city=YourCity&country=YourCountry&method=2"
    ```
-4. Restart Claude Code to reload the statusline
+5. Restart Claude Code to reload the statusline
 
 **Build errors?**
 - Ensure Node.js 18+ is installed: `node --version`

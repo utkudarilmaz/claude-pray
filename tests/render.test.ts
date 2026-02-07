@@ -25,7 +25,7 @@ describe('Render', () => {
       assert.ok(!result.includes('NOW'));
     });
 
-    it('should render NOW when prayer is imminent', async () => {
+    it('should render time remaining with green color when prayer is imminent', async () => {
       const { renderPrayerLine } = await import('../dist/render/prayer-line.js');
 
       const prayer = {
@@ -37,9 +37,11 @@ describe('Render', () => {
 
       const result = renderPrayerLine(prayer);
 
-      assert.ok(result.includes('☪'));
-      assert.ok(result.includes('Maghrib'));
-      assert.ok(result.includes('NOW'));
+      assert.ok(result.includes('☪'), 'should contain crescent symbol');
+      assert.ok(result.includes('Maghrib'), 'should contain prayer name');
+      assert.ok(result.includes('in 5m'), 'should show time remaining');
+      assert.ok(result.includes('\x1b[32m'), 'should use green color');
+      assert.ok(!result.includes('NOW'), 'should not contain NOW text');
     });
 
     it('should render unavailable message when prayer is null', async () => {

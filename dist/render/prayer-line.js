@@ -6,10 +6,10 @@ export function renderPrayerLine(prayer) {
     }
     const symbol = cyan(CRESCENT);
     const name = yellow(prayer.name);
-    if (prayer.isNow) {
-        return `${symbol} ${name} ${green('NOW')}`;
-    }
-    return `${symbol} ${name} ${dim(`in ${prayer.remaining}`)}`;
+    const timeInfo = prayer.isNow
+        ? green(`in ${prayer.remaining}`)
+        : dim(`in ${prayer.remaining}`);
+    return `${symbol} ${name} ${timeInfo}`;
 }
 export function renderSetupPrompt() {
     return `${cyan(CRESCENT)} ${dim('Run /claude-pray:setup')}`;
