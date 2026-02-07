@@ -2,13 +2,6 @@
   "name": "claude-pray",
   "version": "0.1.0",
   "description": "Islamic prayer times statusline for Claude Code",
-  "commands": [
-    {
-      "name": "setup",
-      "description": "Configure claude-pray with your location and prayer calculation method",
-      "file": "commands/setup.md"
-    }
-  ],
   "author": {
     "name": "Rush"
   },
