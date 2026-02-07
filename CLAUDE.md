@@ -18,7 +18,7 @@ claude-pray/
 │   ├── marketplace.json      # Marketplace metadata (owner, category, tags)
 │   └── CLAUDE.md             # Plugin directory instructions
 ├── commands/
-│   └── SETUP.md              # Interactive setup command documentation
+│   └── setup.md              # Interactive setup command documentation
 ├── src/
 │   ├── index.ts              # Entry point - orchestrates stdin → config → render
 │   ├── stdin.ts              # Parse JSON from Claude Code via stdin
@@ -317,7 +317,7 @@ The plugin intentionally has zero runtime dependencies to:
 
 ## Setup Command
 
-The `/claude-pray:setup` command is an interactive setup wizard documented in `commands/SETUP.md`.
+The `/claude-pray:setup` command is an interactive setup wizard documented in `commands/setup.md`.
 
 **Flow:**
 1. Detect runtime (prefer Bun, fallback to Node.js)
@@ -327,7 +327,7 @@ The `/claude-pray:setup` command is an interactive setup wizard documented in `c
 5. Update `~/.claude/claude-pray.json` and `~/.claude/settings.json`
 6. Confirm success
 
-**Implementation**: Claude Code reads `SETUP.md` and executes instructions using available tools (AskUserQuestion, Edit, Write, Bash).
+**Implementation**: Claude Code reads `setup.md` and executes instructions using available tools (AskUserQuestion, Edit, Write, Bash).
 
 ## Troubleshooting
 
