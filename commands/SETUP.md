@@ -1,6 +1,6 @@
 ---
-name: setup
 description: Configure claude-pray with your location and prayer calculation method
+allowed-tools: Bash, Read, Edit, Write, AskUserQuestion
 ---
 
 # claude-pray Setup
