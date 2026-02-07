@@ -1,3 +1,4 @@
+import { safeJsonParse, isValidStdinInput } from './validation.js';
 export async function readStdin() {
     const chunks = [];
     for await (const chunk of process.stdin) {
@@ -7,10 +8,6 @@ export async function readStdin() {
     if (!input) {
         return {};
     }
-    try {
-        return JSON.parse(input);
-    }
-    catch {
-        return {};
-    }
+    const parsed = safeJsonParse(input, isValidStdinInput);
+    return parsed ?? {};
 }

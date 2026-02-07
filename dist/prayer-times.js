@@ -1,3 +1,4 @@
+import { safeJsonParse, isValidAladhanResponse, isValidTimeFormat } from './validation.js';
 const API_BASE = 'https://api.aladhan.com/v1/timingsByCity';
 // In-memory cache for prayer times
 let cachedTimings = null;
@@ -23,12 +24,15 @@ export async function fetchPrayerTimes(config) {
             country: config.country,
             method: config.method.toString(),
         });
-        const response = await fetch(`${API_BASE}?${params}`);
+        const response = await fetch(`${API_BASE}?${params}`, {
+            signal: AbortSignal.timeout(5000),
+        });
         if (!response.ok) {
             return null;
         }
-        const data = await response.json();
-        if (data.code !== 200) {
+        const text = await response.text();
+        const data = safeJsonParse(text, isValidAladhanResponse);
+        if (!data) {
             return null;
         }
         // Update cache
@@ -42,6 +46,9 @@ export async function fetchPrayerTimes(config) {
     }
 }
 function parseTimeToDate(timeStr) {
+    if (!isValidTimeFormat(timeStr)) {
+        return null;
+    }
     const [hours, minutes] = timeStr.split(':').map(Number);
     const now = new Date();
     const date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
@@ -66,6 +73,9 @@ export function calculateNextPrayer(timings) {
     // Check each prayer in order
     for (const prayer of MAIN_PRAYERS) {
         const prayerTime = parseTimeToDate(timings[prayer]);
+        if (!prayerTime) {
+            continue; // Skip invalid time
+        }
         const prayerMs = prayerTime.getTime();
         const diffMs = prayerMs - nowMs;
         // If prayer is in the future
@@ -81,6 +91,9 @@ export function calculateNextPrayer(timings) {
     }
     // All prayers passed today, show tomorrow's Fajr
     const tomorrowFajr = parseTimeToDate(timings.Fajr);
+    if (!tomorrowFajr) {
+        return null; // Invalid Fajr time
+    }
     tomorrowFajr.setDate(tomorrowFajr.getDate() + 1);
     const diffMs = tomorrowFajr.getTime() - nowMs;
     return {

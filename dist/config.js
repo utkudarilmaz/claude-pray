@@ -1,6 +1,7 @@
 import { readFile } from 'fs/promises';
 import { homedir } from 'os';
 import { join } from 'path';
+import { safeJsonParse, isValidConfig } from './validation.js';
 const DEFAULT_CONFIG = {
     city: '',
     country: '',
@@ -11,11 +12,11 @@ export async function getConfig() {
     const configPath = join(homedir(), '.claude', 'claude-pray.json');
     try {
         const content = await readFile(configPath, 'utf8');
-        const config = JSON.parse(content);
-        return {
-            ...DEFAULT_CONFIG,
-            ...config,
-        };
+        const config = safeJsonParse(content, isValidConfig);
+        if (config) {
+            return config;
+        }
+        // Invalid config - fall through to default
     }
     catch {
         // Config file doesn't exist or is invalid

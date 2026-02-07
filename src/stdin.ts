@@ -1,4 +1,5 @@
 import type { StdinData } from './types.js';
+import { safeJsonParse, isValidStdinInput } from './validation.js';
 
 export async function readStdin(): Promise<StdinData> {
   const chunks: Buffer[] = [];
@@ -13,9 +14,6 @@ export async function readStdin(): Promise<StdinData> {
     return {};
   }
 
-  try {
-    return JSON.parse(input) as StdinData;
-  } catch {
-    return {};
-  }
+  const parsed = safeJsonParse(input, isValidStdinInput);
+  return parsed ?? {};
 }

@@ -5,6 +5,7 @@ import type {
   PrayerTimings,
   PRAYER_NAMES,
 } from './types.js';
+import { safeJsonParse, isValidAladhanResponse, isValidTimeFormat } from './validation.js';
 
 const API_BASE = 'https://api.aladhan.com/v1/timingsByCity';
 
@@ -40,15 +41,18 @@ export async function fetchPrayerTimes(
       method: config.method.toString(),
     });
 
-    const response = await fetch(`${API_BASE}?${params}`);
+    const response = await fetch(`${API_BASE}?${params}`, {
+      signal: AbortSignal.timeout(5000),
+    });
 
     if (!response.ok) {
       return null;
     }
 
-    const data: AladhanResponse = await response.json();
+    const text = await response.text();
+    const data = safeJsonParse(text, isValidAladhanResponse);
 
-    if (data.code !== 200) {
+    if (!data) {
       return null;
     }
 
@@ -63,7 +67,11 @@ export async function fetchPrayerTimes(
   }
 }
 
-function parseTimeToDate(timeStr: string): Date {
+function parseTimeToDate(timeStr: string): Date | null {
+  if (!isValidTimeFormat(timeStr)) {
+    return null;
+  }
+
   const [hours, minutes] = timeStr.split(':').map(Number);
   const now = new Date();
   const date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
@@ -95,6 +103,11 @@ export function calculateNextPrayer(timings: PrayerTimings): NextPrayer | null {
   // Check each prayer in order
   for (const prayer of MAIN_PRAYERS) {
     const prayerTime = parseTimeToDate(timings[prayer]);
+
+    if (!prayerTime) {
+      continue; // Skip invalid time
+    }
+
     const prayerMs = prayerTime.getTime();
     const diffMs = prayerMs - nowMs;
 
@@ -112,6 +125,11 @@ export function calculateNextPrayer(timings: PrayerTimings): NextPrayer | null {
 
   // All prayers passed today, show tomorrow's Fajr
   const tomorrowFajr = parseTimeToDate(timings.Fajr);
+
+  if (!tomorrowFajr) {
+    return null; // Invalid Fajr time
+  }
+
   tomorrowFajr.setDate(tomorrowFajr.getDate() + 1);
 
   const diffMs = tomorrowFajr.getTime() - nowMs;
